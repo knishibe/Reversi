@@ -10,9 +10,11 @@ class Reversi {
 
 public:
 	Reversi();
-	bool checkWin(int player);
-	void flip(int square, int player);
+	int getPlayer();
+	bool checkWin();
+	void flip(int square);
 	void display_board();
+	void display_board_moves();
 	void display_moves();
 	void computer_turn(bool withHeuristic); 
 	void human_turn();
@@ -21,8 +23,12 @@ public:
 protected:
 	int board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 	int turn;
+	int player;
 	//int heuristic();
 	//tuple<int, int, int> randomPlayouts(int move); //Emily
-	//vector<int> possible_moves();
+	vector<int> possible_moves();
+	vector<int> possible_moves(int game_board[8][8]);
+	tuple<int, int> nextSpot(tuple<int, int> currentSpot, string direction);
+	vector<tuple<int, int>> find_pieces(int game_board[8][8]);
 };
 

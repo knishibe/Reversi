@@ -7,6 +7,7 @@ int main()
 {
     Reversi* game = new Reversi();
     game->display_board();
+    game->display_moves();
 
     return 0;
 }
