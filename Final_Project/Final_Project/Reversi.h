@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include <tuple>
 #include <vector>
 
@@ -11,7 +11,7 @@ class Reversi {
 public:
 	Reversi();
 	bool checkWin(int player);
-	void flip();
+	void flip(int square, int player);
 	void display_board();
 	void display_moves();
 	void computer_turn(bool withHeuristic); 
@@ -21,8 +21,8 @@ public:
 protected:
 	int board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 	int turn;
-	int heuristic();
-	tuple<int, int, int> randomPlayouts(int move); //Emily
-	vector<int> possible_moves();
+	//int heuristic();
+	//tuple<int, int, int> randomPlayouts(int move); //Emily
+	//vector<int> possible_moves();
 };
 

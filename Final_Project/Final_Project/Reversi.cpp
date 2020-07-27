@@ -10,24 +10,50 @@ Reversi::Reversi() {
 }
 
 bool Reversi::checkWin(int player) {
-	int one = 0;
-	int two = 0;
+	int squares = 0;
 
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			if (board[i][j] == 1) {
-				one++
-			} else if(board[i][j] == )
+			if (board[i][j] == player) {
+				squares++;
+			}
 		}
 	}
+
+	if (squares > (BOARD_SIZE * BOARD_SIZE / 2)) {
+		return true;
+	} else {
+		return false;
+	}
+
 }
 
-void Reversi::flip() {
+void Reversi::flip(int square, int player) {
+	int row = (square-1)/8;
+	int column = (square-1) % 8;
 
 }
 
 void Reversi::display_board() {
-
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			cout << " ";
+			if (board[i][j] == 1) {
+				cout << "W";
+			} else if (board[i][j] == 2) {
+				cout << "B";
+			} else {
+				cout << " ";
+			}
+			if (j != BOARD_SIZE - 1) {
+				cout << " |";
+			}
+		}
+		cout << "\n";
+		if (i != BOARD_SIZE - 1) {
+			cout << "-------------------------------\n";
+		} 
+	}
 }
 
 void Reversi::display_moves() {
@@ -43,17 +69,17 @@ void Reversi::human_turn() {
 }
 
 void Reversi::change_turn() {
-
+	turn = (turn % 2) + 1;
 }
 
-int Reversi::heuristic() {
-
-}
-
-tuple<int, int, int> Reversi::randomPlayouts(int move) {
-
-}
-
-vector<int> Reversi::possible_moves() {
-
-}
+//int Reversi::heuristic() {
+//
+//}
+//
+//tuple<int, int, int> Reversi::randomPlayouts(int move) {
+//
+//}
+//
+//vector<int> Reversi::possible_moves() {
+//
+//}
