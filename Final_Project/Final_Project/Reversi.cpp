@@ -56,40 +56,38 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 	string directions[] = { "up", "down", "left", "right", "upper_right", "upper_left", "lower_right", "lower_left" };
 
 	for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
-row = current_row;
-column = current_column;
-flip = false;
-opposite_player = false;
-while (true) {
-	next_square = nextSpot(make_tuple(row, column), directions[i]);
-	row = get<0>(next_square);
-	column = get<1>(next_square);
-	if (board[row][column] == turn && opposite_player == true) {
-		flip = true;
-		break;
+		row = current_row;
+		column = current_column;
+		flip = false;
+		opposite_player = false;
+		while (true) {
+			next_square = nextSpot(make_tuple(row, column), directions[i]);
+			row = get<0>(next_square);
+			column = get<1>(next_square);
+			if (board[row][column] == turn && opposite_player == true) {
+				flip = true;
+				break;
+			}
+			else if (board[row][column] == (turn % 2) + 1) {
+				opposite_player = true;
+			}
+			else {
+				break;
+			}
+		}
+		if (flip) {
+			next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
+			current_row = get<0>(next_square);
+			current_column = get<1>(next_square);
+			board[current_row][current_column] = turn;
+			while (!(current_row == row && current_column == column)) {
+				next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
+				current_row = get<0>(next_square);
+				current_column = get<1>(next_square);
+				board[current_row][current_column] = turn;
+			}
+		}
 	}
-	else if (board[row][column] == (turn % 2) + 1) {
-		opposite_player = true;
-	}
-	else {
-		break;
-	}
-}
-if (flip) {
-	next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
-	current_row = get<0>(next_square);
-	current_column = get<1>(next_square);
-	board[current_row][current_column] = turn;
-	while (!(current_row == row && current_column == column)) {
-		next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
-		current_row = get<0>(next_square);
-		current_column = get<1>(next_square);
-		board[current_row][current_column] = turn;
-	}
-}
-
-	}
-
 }
 
 void Reversi::display_board() {
