@@ -12,9 +12,10 @@ public:
 	Reversi();
 	int getPlayer();
 	bool checkWin();
+	bool checkWin(int game_board[8][8]);
 	void flip(int square);
+	void flip(int square, int game_board[8][8]);
 	void display_board();
-	void display_board_moves();
 	void display_moves();
 	void computer_turn(bool withHeuristic); 
 	void human_turn();

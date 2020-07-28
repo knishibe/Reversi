@@ -14,11 +14,15 @@ int Reversi::getPlayer() {
 }
 
 bool Reversi::checkWin() {
+	return checkWin(board);
+}
+
+bool Reversi::checkWin(int game_board[8][8]) {
 	int squares = 0;
 
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			if (board[i][j] == player) {
+			if (game_board[i][j] == player) {
 				squares++;
 			}
 		}
@@ -33,8 +37,54 @@ bool Reversi::checkWin() {
 }
 
 void Reversi::flip(int square) {
-	int row = (square-1)/8;
-	int column = (square-1) % 8;
+	flip(square, board);
+	return;
+}
+
+void Reversi::flip(int square, int game_board[8][8]) {
+	int current_row = (square-1)/8;
+	int current_column = (square-1) % 8;
+	int row = 0;
+	int column = 0;
+	tuple<int, int> next_square;
+	bool opposite_player = false;
+	bool flip = false;
+	string directions[] = { "up", "down", "left", "right", "upper_right", "upper_left", "lower_right", "lower_left" };
+
+	for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
+		row = current_row;
+		column = current_column;
+		flip = false;
+		opposite_player = false;
+		while (true) {
+			next_square = nextSpot(make_tuple(row, column), directions[i]);
+			row = get<0>(next_square);
+			column = get<1>(next_square);
+			if (board[row][column] == player && opposite_player == true) {
+				flip = true;
+				break;
+			}
+			else if (board[row][column] == (player % 2) + 1) {
+				opposite_player = true;
+			}
+			else {
+				break;
+			}
+		}
+		if (flip) {
+			next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
+			current_row = get<0>(next_square);
+			current_column = get<1>(next_square);
+			board[current_row][current_column] = player;
+			while (!(current_row == row && current_column == column)) {
+				next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
+				current_row = get<0>(next_square);
+				current_column = get<1>(next_square);
+				board[current_row][current_column] = player;
+			}
+		}
+
+	}
 
 }
 
