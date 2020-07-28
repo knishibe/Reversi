@@ -146,7 +146,16 @@ void Reversi::computer_turn(bool withHeuristic) {
 }
 
 void Reversi::human_turn() {
-
+	int square = 0;
+	int row = 0;
+	int column = 0;
+	cout << "The following are legal moves\n";
+	display_moves();
+	cout << "Please select the square you would like to play: ";
+	cin >> square;
+	row = (square - 1) / 8;
+	column = (square - 1) % 8;
+	board[row][column] = player;
 }
 
 void Reversi::change_turn() {
