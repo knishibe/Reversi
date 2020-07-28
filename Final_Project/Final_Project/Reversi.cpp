@@ -11,6 +11,7 @@ Reversi::Reversi() {
 	board[4][3] = 2;
 	board[4][4] = 1;
 	player = 1;
+	game_terminate = false;
 	return;
 }
 
@@ -20,6 +21,10 @@ int Reversi::getPlayer() {
 
 bool Reversi::checkWin() {
 	return checkWin(board, player);
+}
+
+bool Reversi::terminate() {
+	return game_terminate;
 }
 
 bool Reversi::checkWin(int game_board[8][8], int turn) {
@@ -35,6 +40,7 @@ bool Reversi::checkWin(int game_board[8][8], int turn) {
 
 	if (squares > (BOARD_SIZE * BOARD_SIZE / 2)) {
 		return true;
+		game_terminate = true;
 	} else {
 		return false;
 	}
@@ -110,6 +116,7 @@ void Reversi::display_board() {
 			cout << "---------------------------------------\n";
 		}
 	}
+	cout << "\n\n\n";
 }
 
 void Reversi::display_moves() {
@@ -141,6 +148,7 @@ void Reversi::display_moves() {
 			cout << "---------------------------------------\n";
 		}
 	}
+	cout << "\n\n\n";
 }
 
 void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuristic, bool corners_and_stability_Heuristic) {
@@ -181,6 +189,46 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 		flip(next_move);
 		change_turn();
 	}
+}
+
+// Returns the move with the highest corner heuristic value
+int Reversi::capture_corners_heuristic() {
+	//int computer_score = 0;
+	//vector<int> moves = possible_moves();
+	//vector<pair<int, int>> move_coord;
+	//
+	//// Create a vector of move coordinates
+	//for (int i = 0; i < moves.size(); i++) {
+	//	int row = (moves[i] - 1) / 8;
+	//	int column = (moves[i] - 1) % 8;
+	//	move_coord.push_back(pair<int, int>(row, column));
+	//}
+
+	//// Score captured corners
+	//if (board[0][0] != 0 || board[0][7] != 0 || board[7][0] != 0 || board[7][7] != 0) {
+	//	(board[0][0] == 1) ? computer_score += 4 : computer_score;
+	//	(board[0][7] == 1) ? computer_score += 4 : computer_score;
+	//	(board[7][0] == 1) ? computer_score += 4 : computer_score;
+	//	(board[7][7] == 1) ? computer_score += 4 : computer_score;
+	//}
+
+	//// Check if corners can be partially captured
+	//for (int i = 0; i < move_coord.size(); i++) {
+	//	if (move_coord[i].first == 0 and move_coord[i].second == 0) {
+	//		computer_score += 2;
+	//	}
+	//	if (move_coord[i].first == 0 and move_coord[i].second == 7) {
+	//		computer_score += 2;
+	//	}
+	//	if (move_coord[i].first == 7 and move_coord[i].second == 0) {
+	//		computer_score += 2;
+	//	}
+	//	if (move_coord[i].first == 7 and move_coord[i].second == 7) {
+	//		computer_score += 2;
+	//	}
+	//}
+
+	return 0;
 }
 
 void Reversi::human_turn() {
@@ -351,9 +399,10 @@ vector<tuple<int, int>> Reversi::find_pieces(int game_board[8][8]) {
 	vector<tuple<int, int>> pieces;
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			if (game_board[i][j] == player) { 
+			if (game_board[i][j] == player) {
 				pieces.push_back(make_tuple(i, j));
 			}
 		}
 	}
 	return pieces;
+}
