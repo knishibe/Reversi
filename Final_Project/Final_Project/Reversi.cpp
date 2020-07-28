@@ -1,4 +1,9 @@
 ﻿#include "Reversi.h"
+#include <algorithm>
+#include <iostream>
+#include <ctime>
+#include <map>
+using namespace std;
 
 Reversi::Reversi() {
 	board[3][3] = 1;
@@ -14,15 +19,15 @@ int Reversi::getPlayer() {
 }
 
 bool Reversi::checkWin() {
-	return checkWin(board);
+	return checkWin(board, player);
 }
 
-bool Reversi::checkWin(int game_board[8][8]) {
+bool Reversi::checkWin(int game_board[8][8], int turn) {
 	int squares = 0;
 
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			if (game_board[i][j] == player) {
+			if (game_board[i][j] == turn) {
 				squares++;
 			}
 		}
@@ -33,15 +38,14 @@ bool Reversi::checkWin(int game_board[8][8]) {
 	} else {
 		return false;
 	}
-
 }
 
 void Reversi::flip(int square) {
-	flip(square, board);
+	flip(square, board, player);
 	return;
 }
 
-void Reversi::flip(int square, int game_board[8][8]) {
+void Reversi::flip(int square, int game_board[8][8], int turn) {
 	int current_row = (square-1)/8;
 	int current_column = (square-1) % 8;
 	int row = 0;
@@ -52,37 +56,37 @@ void Reversi::flip(int square, int game_board[8][8]) {
 	string directions[] = { "up", "down", "left", "right", "upper_right", "upper_left", "lower_right", "lower_left" };
 
 	for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
-		row = current_row;
-		column = current_column;
-		flip = false;
-		opposite_player = false;
-		while (true) {
-			next_square = nextSpot(make_tuple(row, column), directions[i]);
-			row = get<0>(next_square);
-			column = get<1>(next_square);
-			if (board[row][column] == player && opposite_player == true) {
-				flip = true;
-				break;
-			}
-			else if (board[row][column] == (player % 2) + 1) {
-				opposite_player = true;
-			}
-			else {
-				break;
-			}
-		}
-		if (flip) {
-			next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
-			current_row = get<0>(next_square);
-			current_column = get<1>(next_square);
-			board[current_row][current_column] = player;
-			while (!(current_row == row && current_column == column)) {
-				next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
-				current_row = get<0>(next_square);
-				current_column = get<1>(next_square);
-				board[current_row][current_column] = player;
-			}
-		}
+row = current_row;
+column = current_column;
+flip = false;
+opposite_player = false;
+while (true) {
+	next_square = nextSpot(make_tuple(row, column), directions[i]);
+	row = get<0>(next_square);
+	column = get<1>(next_square);
+	if (board[row][column] == turn && opposite_player == true) {
+		flip = true;
+		break;
+	}
+	else if (board[row][column] == (turn % 2) + 1) {
+		opposite_player = true;
+	}
+	else {
+		break;
+	}
+}
+if (flip) {
+	next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
+	current_row = get<0>(next_square);
+	current_column = get<1>(next_square);
+	board[current_row][current_column] = turn;
+	while (!(current_row == row && current_column == column)) {
+		next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
+		current_row = get<0>(next_square);
+		current_column = get<1>(next_square);
+		board[current_row][current_column] = turn;
+	}
+}
 
 	}
 
@@ -106,7 +110,7 @@ void Reversi::display_board() {
 		cout << "\n";
 		if (i != BOARD_SIZE - 1) {
 			cout << "---------------------------------------\n";
-		} 
+		}
 	}
 }
 
@@ -141,8 +145,44 @@ void Reversi::display_moves() {
 	}
 }
 
-void Reversi::computer_turn(bool withHeuristic) {
+void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuristic, bool corners_and_stability_Heuristic) {
+	map<int, int> results;
+	int next_move = 0;
+	
+	if (capture_Corners_Heuristic) {
 
+	}
+	else if (stability_Heuristic) {
+
+	}
+	else if (corners_and_stability_Heuristic) {
+
+	}
+	else {
+		vector<int> moves = possible_moves();
+		for (int i=0; i<moves.size(); i++){
+			tuple<int, int, int> stat = randomPlayouts(moves[i]);
+			results[moves[i]] = get<1>(stat); // can modify equation 
+		}
+		
+		// get move resulting in the smallest amount of ties
+		int next_move = results.begin()->first;
+		int min_Ties = results.begin()->second;
+		int test_move = 0;
+		map<int, int>::iterator it;
+		for (it = results.begin(); it != results.end(); it++)
+		{
+			test_move = it->second; // get dict value
+			if (test_move < min_Ties) {
+				min_Ties = test_move;
+				next_move = it->first;
+			}
+		}
+
+		board[(next_move - 1) / BOARD_SIZE][(next_move - 1) % BOARD_SIZE] = player;
+		flip(next_move);
+		change_turn();
+	}
 }
 
 void Reversi::human_turn() {
@@ -156,6 +196,8 @@ void Reversi::human_turn() {
 	row = (square - 1) / 8;
 	column = (square - 1) % 8;
 	board[row][column] = player;
+	flip(square);
+	change_turn();
 }
 
 void Reversi::change_turn() {
@@ -166,16 +208,71 @@ void Reversi::change_turn() {
 //
 //}
 //
-//tuple<int, int, int> Reversi::randomPlayouts(int move) {
-//
-//}
 
 
-vector<int> Reversi::possible_moves() {
-	return possible_moves(board);
+tuple<int, int, int> Reversi::randomPlayouts(int move) {
+	int wins = 0;
+	int ties = 0;
+	int losts = 0;
+
+	int col = (move - 1) % BOARD_SIZE;
+	int row = (move - 1) / BOARD_SIZE;
+
+	int turn = 0;
+
+	srand(time(nullptr));
+
+	for (int i = 0; i < 10000; i++) {
+		// Create simulation board
+		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
+		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
+
+		// Computers makes the theoretical move
+		sim_board[row][col] = 1;
+		turn = 0; // player's turn
+
+		vector<int> moves = possible_moves(sim_board, turn);
+		bool win = false;
+
+		while (moves.size() > 0) {
+			int index = rand() % moves.size();
+			int nextMove = moves[index];
+
+			if (turn == 1) {
+				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 1;
+				flip(nextMove, sim_board, 1);
+			}
+			else {
+				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 0;
+				flip(nextMove, sim_board, 0);
+			}
+
+			win = checkWin(sim_board, turn);
+			if (win and turn == 1) {
+				wins += 1;
+				break;
+			}
+			else if (win and turn == 0) {
+				losts += 1;
+				break;
+			}
+
+			(turn == 0) ? turn = 1 : turn = 0;
+			moves = possible_moves(sim_board, turn);
+		}
+
+		if (!win and moves.size() == 0) {
+			ties += 1;
+		}
+	}
+	return tie(wins, ties, losts);
 }
 
-vector<int> Reversi::possible_moves(int game_board[8][8]) {
+vector<int> Reversi::possible_moves() {
+	return possible_moves(board, player);
+}
+
+vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 	vector<int> moves;
 	vector<tuple<int, int>> pieces = find_pieces(game_board);
 	tuple<int, int> square;
@@ -199,7 +296,7 @@ vector<int> Reversi::possible_moves(int game_board[8][8]) {
 				if (board[row][column] == 0 && opposite_player == true) {
 					moves.push_back(row * 8 + column + 1);
 					break;
-				} else if (board[row][column] == (player % 2) + 1) {
+				} else if (board[row][column] == (turn % 2) + 1) {
 					opposite_player = true;
 				} else {
 					break;
@@ -262,4 +359,3 @@ vector<tuple<int, int>> Reversi::find_pieces(int game_board[8][8]) {
 		}
 	}
 	return pieces;
-}
