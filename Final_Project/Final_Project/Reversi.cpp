@@ -385,12 +385,17 @@ vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 				square = nextSpot(make_tuple(row, column), directions[j]);
 				row = get<0>(square);
 				column = get<1>(square);
-				if (game_board[row][column] == 0 && opposite_player == true) {
+				if (row == -1 || column == -1) {
+					break; // no more moves
+				}
+				else if (game_board[row][column] == 0 && opposite_player == true) {
 					moves.push_back(row * 8 + column + 1);
 					break;
-				} else if (game_board[row][column] == (turn % 2) + 1) {
+				} 
+				else if (game_board[row][column] == (turn % 2) + 1) {
 					opposite_player = true;
-				} else {
+				} 
+				else {
 					break;
 				}
 			}
@@ -438,7 +443,7 @@ tuple<int, int> Reversi::nextSpot(tuple<int, int> currentSpot, string direction)
 			return make_tuple(i - 1, j - 1);
 		}
 	}
-	return make_tuple(NULL, NULL);
+	return make_tuple(-1, -1);
 }
 
 vector<tuple<int, int>> Reversi::find_pieces(int game_board[8][8]) {
