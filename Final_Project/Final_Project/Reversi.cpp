@@ -6,30 +6,17 @@
 #include <iomanip>
 using namespace std;
 
-Reversi::Reversi() {
+Reversi::Reversi(int p) {
 	board[3][3] = 1;
 	board[3][4] = 2;
 	board[4][3] = 2;
 	board[4][4] = 1;
+	player = p;
 	game_terminate = false;
-	cout << "==================================================================\n\n";
+
+	cout << "\n==================================================================\n\n";
 	cout << setw(37)<< "REVERSI\n\n";
 	cout << "==================================================================\n\n";
-
-	char choice = NULL;
-	while (choice != 'y' && choice != 'n') {
-		cout << "Would you like to go first? (y/n): ";
-		cin >> choice;
-	}
-	
-	if (choice == 'y') {
-		player = 2;
-	}
-	else {
-		player = 1;
-	}
-
-	cout << "\n";
 	return;
 }
 

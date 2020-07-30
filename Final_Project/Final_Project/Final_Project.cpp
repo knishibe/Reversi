@@ -7,7 +7,17 @@ using namespace std;
 
 int main()
 {
-    Reversi* game = new Reversi();
+    char choice = NULL;
+    while (choice != 'y' && choice != 'n') {
+        cout << "Would you like to go first? (y/n): ";
+        cin >> choice;
+    }
+
+    int player = 0;
+    (choice == 'y') ? player = 2 : player = 1;
+    Reversi* game = new Reversi(player);
+
+    cout << "\n";
     game->display_moves();
     while (!game->terminate()) {
         if (game->getPlayer() == 1) {

@@ -10,7 +10,7 @@ const int BOARD_SIZE = 8;
 class Reversi {
 
 public:
-	Reversi();
+	Reversi(int p);
 	int getPlayer();
 	bool checkWin();
 	bool checkWin(int game_board[8][8], int turn);
