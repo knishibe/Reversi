@@ -23,11 +23,9 @@ Reversi::Reversi() {
 	}
 	
 	if (choice == 'y') {
-		first = 'U';
 		player = 2;
 	}
 	else {
-		first = 'C';
 		player = 1;
 	}
 
