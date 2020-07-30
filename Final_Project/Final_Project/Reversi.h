@@ -30,6 +30,7 @@ protected:
 	int board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 	int player;
 	bool game_terminate;
+	char first; 
 	//int heuristic();
 	vector<int> possible_moves();
 	vector<int> possible_moves(int game_board[8][8], int turn);

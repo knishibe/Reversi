@@ -11,11 +11,27 @@ Reversi::Reversi() {
 	board[3][4] = 2;
 	board[4][3] = 2;
 	board[4][4] = 1;
-	player = 1;
 	game_terminate = false;
 	cout << "==================================================================\n\n";
 	cout << setw(37)<< "REVERSI\n\n";
 	cout << "==================================================================\n\n";
+
+	char choice = NULL;
+	while (choice != 'y' && choice != 'n') {
+		cout << "Would you like to go first? (y/n): ";
+		cin >> choice;
+	}
+	
+	if (choice == 'y') {
+		first = 'U';
+		player = 2;
+	}
+	else {
+		first = 'C';
+		player = 1;
+	}
+
+	cout << "\n";
 	return;
 }
 
@@ -306,10 +322,11 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 		// Create simulation board
 		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
+		turn = getPlayer();
 
 		// Computers makes the theoretical move
-		sim_board[row][col] = 1;
-		turn = 0; // player's turn
+		sim_board[row][col] = turn;
+		turn = (turn % 2) + 1;; // player's turn
 
 		vector<int> moves = possible_moves(sim_board, turn);
 		bool win = false;
@@ -323,8 +340,8 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 				flip(nextMove, sim_board, 1);
 			}
 			else {
-				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 0;
-				flip(nextMove, sim_board, 0);
+				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 2;
+				flip(nextMove, sim_board, 2);
 			}
 
 			win = checkWin(sim_board, turn);
@@ -332,12 +349,12 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 				wins += 1;
 				break;
 			}
-			else if (win and turn == 0) {
+			else if (win and turn == 2) {
 				losts += 1;
 				break;
 			}
 
-			(turn == 0) ? turn = 1 : turn = 0;
+			(turn == 2) ? turn = 1 : turn = 2;
 			moves = possible_moves(sim_board, turn);
 		}
 
