@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ctime>
 #include <map>
+#include <iomanip>
 using namespace std;
 
 Reversi::Reversi() {
@@ -12,6 +13,9 @@ Reversi::Reversi() {
 	board[4][4] = 1;
 	player = 1;
 	game_terminate = false;
+	cout << "==================================================================\n\n";
+	cout << setw(37)<< "REVERSI\n\n";
+	cout << "==================================================================\n\n";
 	return;
 }
 
@@ -70,11 +74,11 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 			next_square = nextSpot(make_tuple(row, column), directions[i]);
 			row = get<0>(next_square);
 			column = get<1>(next_square);
-			if (board[row][column] == turn && opposite_player == true) {
+			if (game_board[row][column] == turn && opposite_player == true) {
 				flip = true;
 				break;
 			}
-			else if (board[row][column] == (turn % 2) + 1) {
+			else if (game_board[row][column] == (turn % 2) + 1) {
 				opposite_player = true;
 			}
 			else {
@@ -85,12 +89,12 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 			next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
 			current_row = get<0>(next_square);
 			current_column = get<1>(next_square);
-			board[current_row][current_column] = turn;
+			game_board[current_row][current_column] = turn;
 			while (!(current_row == row && current_column == column)) {
 				next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
 				current_row = get<0>(next_square);
 				current_column = get<1>(next_square);
-				board[current_row][current_column] = turn;
+				game_board[current_row][current_column] = turn;
 			}
 		}
 	}
@@ -148,13 +152,21 @@ void Reversi::display_moves() {
 			cout << "---------------------------------------\n";
 		}
 	}
-	cout << "\n\n\n";
+	cout << "\n\n";
 }
 
 void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuristic, bool corners_and_stability_Heuristic) {
 	map<int, int> results;
 	int next_move = 0;
-	
+
+	cout << "Computer's Turn...\n\n";
+	vector<int> moves = possible_moves();
+	if (moves.empty()) {// no valid moves. Change turn
+		cout << "No valid moves available\n";
+		change_turn();
+		return;
+	}
+
 	if (capture_Corners_Heuristic) {
 
 	}
@@ -166,11 +178,11 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 	}
 	else {
 		vector<int> moves = possible_moves();
-		for (int i=0; i<moves.size(); i++){
+		for (int i = 0; i < moves.size(); i++) {
 			tuple<int, int, int> stat = randomPlayouts(moves[i]);
 			results[moves[i]] = get<1>(stat); // can modify equation 
 		}
-		
+
 		// get move resulting in the smallest amount of ties
 		int next_move = results.begin()->first;
 		int min_Ties = results.begin()->second;
@@ -187,6 +199,7 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 
 		board[(next_move - 1) / BOARD_SIZE][(next_move - 1) % BOARD_SIZE] = player;
 		flip(next_move);
+		checkWin();
 		change_turn();
 	}
 }
@@ -235,14 +248,35 @@ void Reversi::human_turn() {
 	int square = 0;
 	int row = 0;
 	int column = 0;
-	cout << "The following are legal moves\n";
-	display_moves();
-	cout << "Please select the square you would like to play: ";
-	cin >> square;
+	bool valid_move = false;
+	cout << "User's Turn...\n";
+
+	while (!valid_move) {
+		vector<int> moves = possible_moves();
+		if (moves.empty()) {// no valid moves. Change turn
+			cout << "No valid moves available\n";
+			change_turn();
+			return;
+		}
+
+		cout << "The numbered squares below are the possible moves that you can make.\n\n";
+		display_moves();
+		cout << "Please select the square you would like to play: ";
+		cin >> square;
+
+		if (find(moves.begin(), moves.end(), square) != moves.end()) {
+			valid_move = true;
+		}
+		else {
+			cout << "\nERROR: The square that you have chosen is not valid. Please select a valid move.\n";
+		}
+	}
+
 	row = (square - 1) / 8;
 	column = (square - 1) % 8;
 	board[row][column] = player;
 	flip(square);
+	checkWin();
 	change_turn();
 }
 
@@ -268,7 +302,7 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 
 	srand(time(nullptr));
 
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 5000; i++) {
 		// Create simulation board
 		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
