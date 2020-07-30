@@ -6,12 +6,12 @@
 #include <iomanip>
 using namespace std;
 
-Reversi::Reversi(int p) {
+Reversi::Reversi() {
 	board[3][3] = 1;
 	board[3][4] = 2;
 	board[4][3] = 2;
 	board[4][4] = 1;
-	player = p;
+	player = 1;
 	game_terminate = false;
 
 	cout << "\n==================================================================\n\n";
@@ -171,7 +171,6 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 	vector<int> moves = possible_moves();
 	if (moves.empty()) {// no valid moves. Change turn
 		cout << "No valid moves available\n";
-		change_turn();
 		no_valid_moves++;
 		return;
 	}
@@ -208,8 +207,6 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 
 		board[(next_move - 1) / BOARD_SIZE][(next_move - 1) % BOARD_SIZE] = player;
 		flip(next_move);
-		checkWin();
-		change_turn();
 	}
 }
 
@@ -271,7 +268,6 @@ void Reversi::human_turn() {
 		vector<int> moves = possible_moves();
 		if (moves.empty()) {// no valid moves. Change turn
 			cout << "No valid moves available\n";
-			change_turn();
 			no_valid_moves++;
 			return;
 		}
@@ -293,7 +289,6 @@ void Reversi::human_turn() {
 	column = (square - 1) % 8;
 	board[row][column] = player;
 	flip(square);
-	change_turn();
 }
 
 void Reversi::change_turn() {
@@ -390,10 +385,10 @@ vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 				square = nextSpot(make_tuple(row, column), directions[j]);
 				row = get<0>(square);
 				column = get<1>(square);
-				if (board[row][column] == 0 && opposite_player == true) {
+				if (game_board[row][column] == 0 && opposite_player == true) {
 					moves.push_back(row * 8 + column + 1);
 					break;
-				} else if (board[row][column] == (turn % 2) + 1) {
+				} else if (game_board[row][column] == (turn % 2) + 1) {
 					opposite_player = true;
 				} else {
 					break;
