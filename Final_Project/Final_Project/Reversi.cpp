@@ -160,14 +160,22 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 	map<int, int> results;
 	int next_move = 0;
 
+	if (no_valid_moves >= 2) {
+		if (checkWin()) {
+			cout << "Player " << player << " won!\n";
+		}
+		return;
+	}
+
 	cout << "Computer's Turn...\n\n";
 	vector<int> moves = possible_moves();
 	if (moves.empty()) {// no valid moves. Change turn
 		cout << "No valid moves available\n";
 		change_turn();
+		no_valid_moves++;
 		return;
 	}
-
+	no_valid_moves = 0;
 	if (capture_Corners_Heuristic) {
 
 	}
@@ -252,14 +260,22 @@ void Reversi::human_turn() {
 	bool valid_move = false;
 	cout << "User's Turn...\n";
 
+	if (no_valid_moves >= 2) {
+		if (checkWin()) {
+			cout << "Player " << player << " won!\n";
+		}
+		return;
+	}
+
 	while (!valid_move) {
 		vector<int> moves = possible_moves();
 		if (moves.empty()) {// no valid moves. Change turn
 			cout << "No valid moves available\n";
 			change_turn();
+			no_valid_moves++;
 			return;
 		}
-
+		no_valid_moves = 0;
 		cout << "The numbered squares below are the possible moves that you can make.\n\n";
 		display_moves();
 		cout << "Please select the square you would like to play: ";
@@ -277,7 +293,6 @@ void Reversi::human_turn() {
 	column = (square - 1) % 8;
 	board[row][column] = player;
 	flip(square);
-	checkWin();
 	change_turn();
 }
 
