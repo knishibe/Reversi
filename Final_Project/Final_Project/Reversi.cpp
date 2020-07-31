@@ -321,12 +321,19 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 
 		// Computers makes the theoretical move
 		sim_board[row][col] = turn;
-		turn = (turn % 2) + 1;; // player's turn
+		turn = (turn % 2) + 1; // player's turn
 
 		vector<int> moves = possible_moves(sim_board, turn);
 		bool win = false;
 
-		while (moves.size() > 0) {
+		int no_valid_moves = 0;
+		while (moves.empty() && no_valid_moves < 2){
+			no_valid_moves++;
+			turn = (turn % 2) + 1;
+			moves = possible_moves(sim_board, turn);
+		}
+
+		while (moves.size() > 0 && no_valid_moves < 2) {
 			int index = rand() % moves.size();
 			int nextMove = moves[index];
 
@@ -339,23 +346,30 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 				flip(nextMove, sim_board, 2);
 			}
 
-			win = checkWin(sim_board, turn);
-			if (win and turn == 1) {
-				wins += 1;
-				break;
-			}
-			else if (win and turn == 2) {
-				losts += 1;
-				break;
-			}
-
 			(turn == 2) ? turn = 1 : turn = 2;
 			moves = possible_moves(sim_board, turn);
+
+			int no_valid_moves = 0;
+			// Player has no valid moves. Change turn. Only exit the outer while loop if 
+			// there are no valid moves two turns in a row.
+			while (moves.empty() && no_valid_moves < 2) {
+				no_valid_moves++;
+				(turn == 2) ? turn = 1 : turn = 2;
+				moves = possible_moves(sim_board, turn);
+			}
 		}
 
-		if (!win and moves.size() == 0) {
-			ties += 1;
+		win = checkWin(sim_board, turn);
+		if (win and turn == 1) {
+			wins += 1;
+			break;
 		}
+		else if (win and turn == 2) {
+			losts += 1;
+			break;
+		}
+
+		ties += 1; // no win or loss
 	}
 	return tie(wins, ties, losts);
 }
