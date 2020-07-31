@@ -357,6 +357,10 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 				(turn == 2) ? turn = 1 : turn = 2;
 				moves = possible_moves(sim_board, turn);
 			}
+
+			if (no_valid_moves >= 2) {
+				break;
+			}
 		}
 
 		win = checkWin(sim_board, turn);
