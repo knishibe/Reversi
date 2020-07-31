@@ -24,7 +24,7 @@ int Reversi::getPlayer() {
 	return player; 
 }
 
-bool Reversi::checkWin() {
+int Reversi::checkWin() {
 	return checkWin(board, player);
 }
 
@@ -32,22 +32,30 @@ bool Reversi::terminate() {
 	return game_terminate;
 }
 
-bool Reversi::checkWin(int game_board[8][8], int turn) {
-	int squares = 0;
+int Reversi::checkWin(int game_board[8][8], int turn) {
+	int player = 0;
+	int opponent = 0;
 
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
 			if (game_board[i][j] == turn) {
-				squares++;
+				player++;
+			}
+			else if (game_board[i][j] == (turn%2)+1) {
+				opponent++;
 			}
 		}
 	}
 
-	if (squares > (BOARD_SIZE * BOARD_SIZE / 2)) {
-		return true;
+	if (player > opponent) {
+		return 1;
 		game_terminate = true;
-	} else {
-		return false;
+	} 
+	else if (player == opponent) {
+		return 2;
+	}
+	else {
+		return 0;
 	}
 }
 
@@ -106,9 +114,9 @@ void Reversi::display_board() {
 		for (int j = 0; j < BOARD_SIZE; j++) {
 			cout << " ";
 			if (board[i][j] == 1) {
-				cout << " W";
-			} else if (board[i][j] == 2) {
 				cout << " B";
+			} else if (board[i][j] == 2) {
+				cout << " W";
 			} else {
 				cout << "  ";
 			}
@@ -161,8 +169,15 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 	int next_move = 0;
 
 	if (no_valid_moves >= 2) {
-		if (checkWin()) {
+		int win = checkWin();
+		if (win == 1) {
 			cout << "Player " << player << " won!\n";
+		}
+		else if (win == 0) {
+			cout << "Player " << (player%2)+1 << " won!\n";
+		}
+		else {
+			cout << "Tie!\n";
 		}
 		game_terminate = true;
 		return;
@@ -259,8 +274,15 @@ void Reversi::human_turn() {
 	cout << "User's Turn...\n";
 
 	if (no_valid_moves >= 2) {
-		if (checkWin()) {
+		int win = checkWin();
+		if (win == 1) {
 			cout << "Player " << player << " won!\n";
+		}
+		else if (win == 0) {
+			cout << "Player " << (player % 2) + 1 << " won!\n";
+		}
+		else {
+			cout << "Tie!\n";
 		}
 		game_terminate = true;
 		return;
@@ -369,16 +391,17 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 		}
 
 		win = checkWin(sim_board, turn);
-		if (win and turn == 1) {
+		if (win == 1 && turn == 1) {
 			wins += 1;
 			break;
 		}
-		else if (win and turn == 2) {
+		else if (win == 1 && turn == 2) {
 			losts += 1;
 			break;
 		}
-
-		ties += 1; // no win or loss
+		else {
+			ties += 1; // no win or loss
+		}
 	}
 	return tie(wins, ties, losts);
 }

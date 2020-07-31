@@ -18,10 +18,10 @@ int main()
     (choice == 'y') ? computer = 2 : computer = 1;
 
     if (computer == 1) {
-        cout << "Computer Goes First! You are BLACK\n";
+        cout << "Computer Goes First! You are WHITE\n";
     }
     else {
-        cout << "You Go First! You are WHITE\n";
+        cout << "You Go First! You are BLACK\n";
     }
 
     cout << "\n";

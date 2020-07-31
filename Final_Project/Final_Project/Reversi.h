@@ -12,8 +12,8 @@ class Reversi {
 public:
 	Reversi();
 	int getPlayer();
-	bool checkWin();
-	bool checkWin(int game_board[8][8], int turn);
+	int checkWin();
+	int checkWin(int game_board[8][8], int turn);
 	void flip(int square);
 	void flip(int square, int game_board[8][8], int turn);
 	void display_board();
