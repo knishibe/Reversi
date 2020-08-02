@@ -18,12 +18,14 @@ public:
 	void flip(int square, int game_board[8][8], int turn);
 	void display_board();
 	void display_moves();
-	void computer_turn(bool capture_Corners_Heuristic, bool stability_Heuristic, bool corners_and_stability_Heuristic);
+	void computer_turn(bool static_weight_Heuristic);
 	void human_turn();
 	void change_turn();
 	bool terminate();
 
 	tuple<int, int, int> randomPlayouts(int move);
+	tuple<int, int, int> static_weight_Playouts(int move);
+
 	int capture_corners_heuristic();
 
 protected:

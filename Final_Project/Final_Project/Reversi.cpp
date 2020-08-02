@@ -164,9 +164,8 @@ void Reversi::display_moves() {
 	cout << "\n\n";
 }
 
-void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuristic, bool corners_and_stability_Heuristic) {
+void Reversi::computer_turn(bool static_weight_Heuristic) {
 	map<int, int> results;
-	int next_move = 0;
 
 	if (no_valid_moves >= 2) {
 		int win = checkWin();
@@ -191,80 +190,50 @@ void Reversi::computer_turn(bool capture_Corners_Heuristic, bool stability_Heuri
 		return;
 	}
 	no_valid_moves = 0;
-	if (capture_Corners_Heuristic) {
 
-	}
-	else if (stability_Heuristic) {
-
-	}
-	else if (corners_and_stability_Heuristic) {
-
-	}
-	else {
-		vector<int> moves = possible_moves();
+	moves.clear();
+	moves = possible_moves();
+		
+	if (static_weight_Heuristic) {
+		time_t future_time = time(NULL) + 5;
 		for (int i = 0; i < moves.size(); i++) {
-			tuple<int, int, int> stat = randomPlayouts(moves[i]);
+			tuple<int, int, int> stat = static_weight_Playouts(moves[i]);
 			results[moves[i]] = get<1>(stat); // can modify equation 
-		}
 
-		// get move resulting in the smallest amount of ties
-		int next_move = results.begin()->first;
-		int min_Ties = results.begin()->second;
-		int test_move = 0;
-		map<int, int>::iterator it;
-		for (it = results.begin(); it != results.end(); it++)
-		{
-			test_move = it->second; // get dict value
-			if (test_move < min_Ties) {
-				min_Ties = test_move;
-				next_move = it->first;
+			if (time(NULL) > future_time) {
+				break;
 			}
 		}
-
-		board[(next_move - 1) / BOARD_SIZE][(next_move - 1) % BOARD_SIZE] = player;
-		flip(next_move);
 	}
+	else { // pure random playouts
+		time_t future_time = time(NULL) + 5;
+		for (int i = 0; i < moves.size(); i++) {
+			tuple<int, int, int> stat = randomPlayouts(moves[i]);
+			results[moves[i]] = get<1>(stat); // can modify equation
+			if (time(NULL) > future_time) {
+				break;
+			}
+		}
+	}
+		
+	// get move resulting in the smallest amount of ties
+	int next_move = results.begin()->first;
+	int min_Ties = results.begin()->second;
+	int test_move = 0;
+	map<int, int>::iterator it;
+	for (it = results.begin(); it != results.end(); it++)
+	{
+		test_move = it->second; // get dict value
+		if (test_move < min_Ties) {
+			min_Ties = test_move;
+			next_move = it->first;
+		}
+	}
+
+	board[(next_move - 1) / BOARD_SIZE][(next_move - 1) % BOARD_SIZE] = player;
+	flip(next_move);
 }
 
-// Returns the move with the highest corner heuristic value
-int Reversi::capture_corners_heuristic() {
-	//int computer_score = 0;
-	//vector<int> moves = possible_moves();
-	//vector<pair<int, int>> move_coord;
-	//
-	//// Create a vector of move coordinates
-	//for (int i = 0; i < moves.size(); i++) {
-	//	int row = (moves[i] - 1) / 8;
-	//	int column = (moves[i] - 1) % 8;
-	//	move_coord.push_back(pair<int, int>(row, column));
-	//}
-
-	//// Score captured corners
-	//if (board[0][0] != 0 || board[0][7] != 0 || board[7][0] != 0 || board[7][7] != 0) {
-	//	(board[0][0] == 1) ? computer_score += 4 : computer_score;
-	//	(board[0][7] == 1) ? computer_score += 4 : computer_score;
-	//	(board[7][0] == 1) ? computer_score += 4 : computer_score;
-	//	(board[7][7] == 1) ? computer_score += 4 : computer_score;
-	//}
-
-	//// Check if corners can be partially captured
-	//for (int i = 0; i < move_coord.size(); i++) {
-	//	if (move_coord[i].first == 0 and move_coord[i].second == 0) {
-	//		computer_score += 2;
-	//	}
-	//	if (move_coord[i].first == 0 and move_coord[i].second == 7) {
-	//		computer_score += 2;
-	//	}
-	//	if (move_coord[i].first == 7 and move_coord[i].second == 0) {
-	//		computer_score += 2;
-	//	}
-	//	if (move_coord[i].first == 7 and move_coord[i].second == 7) {
-	//		computer_score += 2;
-	//	}
-	//}
-
-	return 0;
-}
 
 void Reversi::human_turn() {
 	int square = 0;
@@ -322,10 +291,110 @@ void Reversi::change_turn() {
 	player = (player % 2) + 1;
 }
 
-//int Reversi::heuristic() {
-//
-//}
-//
+tuple<int, int, int> Reversi::static_weight_Playouts(int move) {
+	const int STATIC_WEIGHT_1[8][8] = { { 4,-3, 2, 2, 2, 2,-3, 4},
+										{-3,-4,-1,-1,-1,-1,-4,-3},
+										{ 2,-1, 1, 0, 0, 1,-1, 2},
+										{ 2,-1, 0, 1, 1, 0,-1, 2},
+										{ 2,-1, 0, 1, 1, 0,-1, 2},
+										{ 2,-1, 1, 0, 0, 1,-1, 2},
+										{-3,-4,-1,-1,-1,-1,-4,-3},
+										{ 4,-3, 2, 2, 2, 2,-3, 4} };
+	int wins = 0;
+	int ties = 0;
+	int losts = 0;
+
+	int col = (move - 1) % BOARD_SIZE;
+	int row = (move - 1) / BOARD_SIZE;
+
+	int turn = 0;
+
+	int i = 0;
+	time_t future_time = time(NULL) + 2;
+
+	while (true) {
+		if (time(NULL) > future_time) {
+			return tie(wins, ties, losts);
+		}
+		// Create simulation board
+		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
+		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
+		turn = getPlayer();
+
+		// Computers makes the theoretical move
+		sim_board[row][col] = turn;
+		turn = (turn % 2) + 1; // player's turn
+
+		vector<int> moves = possible_moves(sim_board, turn);
+		bool win = false;
+
+		int no_valid_moves = 0;
+		while (moves.empty() && no_valid_moves < 2) {
+			no_valid_moves++;
+			turn = (turn % 2) + 1;
+			moves.clear();
+			moves = possible_moves(sim_board, turn);
+		}
+
+		while (moves.size() > 0 && no_valid_moves < 2) {
+			int best_move_score = STATIC_WEIGHT_1[(moves[0] - 1) / BOARD_SIZE][(moves[0] - 1) % BOARD_SIZE];
+			int best_index = 0;
+
+			for (int j = 1; j < moves.size(); j++) {
+				int r = (moves[j] - 1) / BOARD_SIZE;
+				int c = (moves[j] - 1) % BOARD_SIZE; 
+				if (STATIC_WEIGHT_1[r][c] > best_move_score) {
+					best_move_score = STATIC_WEIGHT_1[r][c];
+					best_index = j;
+				}
+				if (time(NULL) > future_time) {
+					return tie(wins, ties, losts);
+				}
+			}
+
+			int nextMove = moves[best_index];
+
+			if (turn == 1) {
+				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 1;
+				flip(nextMove, sim_board, 1);
+			}
+			else {
+				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 2;
+				flip(nextMove, sim_board, 2);
+			}
+
+			(turn == 2) ? turn = 1 : turn = 2;
+			moves.clear();
+			moves = possible_moves(sim_board, turn);
+
+			int no_valid_moves = 0;
+			// Player has no valid moves. Change turn. Only exit the outer while loop if 
+			// there are no valid moves two turns in a row.
+			while (moves.empty() && no_valid_moves < 2) {
+				no_valid_moves++;
+				(turn == 2) ? turn = 1 : turn = 2;
+				moves.clear();
+				moves = possible_moves(sim_board, turn);
+			}
+
+			if (no_valid_moves >= 2) {
+				break;
+			}
+		}
+
+		win = checkWin(sim_board, turn);
+		if (win == 1 && turn == 1) {
+			wins += 1;
+		}
+		else if (win == 1 && turn == 2) {
+			losts += 1;
+		}
+		else {
+			ties += 1; // no win or loss
+		}
+		i++;
+	}
+}
 
 
 tuple<int, int, int> Reversi::randomPlayouts(int move) {
@@ -340,7 +409,13 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 
 	srand(time(nullptr));
 
-	for (int i = 0; i < 5000; i++) {
+	int i = 0;
+	time_t future_time = time(NULL) + 2;
+
+	while (true) {
+		if (time(NULL) > future_time) {
+			return tie(wins, ties, losts);
+		}
 		// Create simulation board
 		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
@@ -357,10 +432,14 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 		while (moves.empty() && no_valid_moves < 2){
 			no_valid_moves++;
 			turn = (turn % 2) + 1;
+			moves.clear();
 			moves = possible_moves(sim_board, turn);
 		}
 
 		while (moves.size() > 0 && no_valid_moves < 2) {
+			if (time(NULL) > future_time) {
+				return tie(wins, ties, losts);
+			}
 			int index = rand() % moves.size();
 			int nextMove = moves[index];
 
@@ -374,6 +453,7 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 			}
 
 			(turn == 2) ? turn = 1 : turn = 2;
+			moves.clear();
 			moves = possible_moves(sim_board, turn);
 
 			int no_valid_moves = 0;
@@ -382,6 +462,7 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 			while (moves.empty() && no_valid_moves < 2) {
 				no_valid_moves++;
 				(turn == 2) ? turn = 1 : turn = 2;
+				moves.clear();
 				moves = possible_moves(sim_board, turn);
 			}
 
@@ -393,17 +474,15 @@ tuple<int, int, int> Reversi::randomPlayouts(int move) {
 		win = checkWin(sim_board, turn);
 		if (win == 1 && turn == 1) {
 			wins += 1;
-			break;
 		}
 		else if (win == 1 && turn == 2) {
 			losts += 1;
-			break;
 		}
 		else {
 			ties += 1; // no win or loss
 		}
+		i++;
 	}
-	return tie(wins, ties, losts);
 }
 
 vector<int> Reversi::possible_moves() {
