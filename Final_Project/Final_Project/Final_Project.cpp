@@ -25,7 +25,7 @@ int main()
     }
 
     cout << "\n";
-    game->display_moves();
+
     while (!game->terminate()) {
         if (game->getPlayer() == computer) {
             game->computer_turn(false, false, false);
