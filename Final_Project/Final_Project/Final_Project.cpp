@@ -73,7 +73,7 @@ int main()
     int ties = 0;
     vector<tuple<int, int>> won_by;
     tuple<int, int, int> win_results;
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 10; i++) {
         Reversi* game = new Reversi();
         int computer = 1;
         
@@ -99,7 +99,7 @@ int main()
         }
         else if (win == 0) {
             v2_Wins++;
-            won_by.push_back(make_tuple(1, get<2>(win_results) - get<1>(win_results)));
+            won_by.push_back(make_tuple(2, get<2>(win_results) - get<1>(win_results)));
         }
         else {
             ties++;
@@ -108,6 +108,11 @@ int main()
     cout << "V1 Wins: " << v1_Wins << endl;
     cout << "V2 Wins: " << v2_Wins << endl;
     cout << "Ties: " << ties << endl;
+    for (int i = 0; i < won_by.size(); i++) {
+        cout << "Game: " << i << "\n";
+        cout << "Winner: " << get<0>(won_by[i]) << "\n";
+        cout << "Won by: " << get<1>(won_by[i]) << "\n\n";
+    }
 
     return 0;
 }
