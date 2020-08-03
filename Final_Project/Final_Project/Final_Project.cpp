@@ -73,7 +73,7 @@ int main()
     int ties = 0;
     vector<tuple<int, int>> won_by;
     tuple<int, int, int> win_results;
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 10; i++) {
         Reversi* game = new Reversi();
         int computer = 1;
         
