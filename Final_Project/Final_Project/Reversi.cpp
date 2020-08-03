@@ -193,16 +193,17 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 
 	moves.clear();
 	moves = possible_moves();
+	float time_per_move = 5.0 / (moves.size());
 		
 	if (static_weight_Heuristic) {
 		for (int i = 0; i < moves.size(); i++) {
-			tuple<int, int, int> stat = playouts(moves[i], true);
+			tuple<int, int, int> stat = playouts(moves[i], true, time_per_move);
 			results[moves[i]] = get<1>(stat); // can modify equation 
 		}
 	}
 	else { // pure random playouts
 		for (int i = 0; i < moves.size(); i++) {
-			tuple<int, int, int> stat = playouts(moves[i], false);
+			tuple<int, int, int> stat = playouts(moves[i], false, time_per_move);
 			results[moves[i]] = get<1>(stat); // can modify equation
 		}
 	}
@@ -282,7 +283,7 @@ void Reversi::change_turn() {
 	player = (player % 2) + 1;
 }
 
-tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic) {
+tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic, float time_per_move) {
 	int wins = 0;
 	int ties = 0;
 	int losts = 0;
@@ -293,9 +294,9 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic) {
 	int turn = 0;
 
 	int i = 0;
-	time_t future_time = time(NULL) + 2;
+	time_t start_time = time(NULL);
 
-	while (time(NULL) > future_time) {
+	while (difftime(time(NULL), start_time) < time_per_move) {
 		// Create simulation board
 		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
