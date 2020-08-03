@@ -7,10 +7,10 @@
 using namespace std;
 
 Reversi::Reversi() {
-	board[3][3] = 1;
-	board[3][4] = 2;
-	board[4][3] = 2;
-	board[4][4] = 1;
+	board[3][3] = 2;
+	board[3][4] = 1;
+	board[4][3] = 1;
+	board[4][4] = 2;
 	player = 1;
 	game_terminate = false;
 
@@ -138,10 +138,10 @@ void Reversi::display_moves() {
 		for (int j = 0; j < BOARD_SIZE; j++) {
 			cout << " ";
 			if (board[i][j] == 1) {
-				cout << " W";
+				cout << " B";
 			}
 			else if (board[i][j] == 2) {
-				cout << " B";
+				cout << " W";
 			}
 			else if (find(moves.begin(), moves.end(), i * 8 + j + 1) != moves.end() && i * 8 + j + 1 < 9) {
 				cout << " " << i * 8 + j + 1;

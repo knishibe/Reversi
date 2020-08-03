@@ -36,7 +36,7 @@ int main()
         }
 
         cout << "\n";
-        game->display_moves();
+
         while (!game->terminate()) {
             if (game->getPlayer() == computer) {
                 version == 1 ? game->computer_turn(false) : game->computer_turn(true);
