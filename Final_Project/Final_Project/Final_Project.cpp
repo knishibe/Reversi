@@ -53,7 +53,7 @@ int main()
         Reversi* game = new Reversi();
         int computer = 1;
 
-        game->display_moves();
+        game->display_board();
         while (!game->terminate()) {
             if (game->getPlayer() == computer) {
                 game->computer_turn(true);
