@@ -195,24 +195,15 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 	moves = possible_moves();
 		
 	if (static_weight_Heuristic) {
-		time_t future_time = time(NULL) + 5;
 		for (int i = 0; i < moves.size(); i++) {
 			tuple<int, int, int> stat = playouts(moves[i], true);
 			results[moves[i]] = get<1>(stat); // can modify equation 
-
-			if (time(NULL) > future_time) {
-				break;
-			}
 		}
 	}
 	else { // pure random playouts
-		time_t future_time = time(NULL) + 5;
 		for (int i = 0; i < moves.size(); i++) {
 			tuple<int, int, int> stat = playouts(moves[i], false);
 			results[moves[i]] = get<1>(stat); // can modify equation
-			if (time(NULL) > future_time) {
-				break;
-			}
 		}
 	}
 		
@@ -304,10 +295,7 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic) {
 	int i = 0;
 	time_t future_time = time(NULL) + 2;
 
-	while (true) {
-		if (time(NULL) > future_time) {
-			return tie(wins, ties, losts);
-		}
+	while (time(NULL) > future_time) {
 		// Create simulation board
 		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
@@ -377,6 +365,7 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic) {
 		}
 		i++;
 	}
+	return tie(wins, ties, losts);
 }
 
 int Reversi::best_static_weight_move(vector<int> moves) {
@@ -425,6 +414,7 @@ vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 	int current_column = 0;
 	int row = 0;
 	int column = 0;
+	int move = 0;
 	for(auto& i : pieces)  {
 		current_row = get<0>(i);
 		current_column = get<1>(i);
@@ -440,7 +430,10 @@ vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 					break; // no more moves
 				}
 				else if (game_board[row][column] == 0 && opposite_player == true) {
-					moves.push_back(row * 8 + column + 1);
+					move = row * 8 + column + 1;
+					if (find(moves.begin(), moves.end(), move) == moves.end()) {
+						moves.push_back(move);
+					}
 					break;
 				} 
 				else if (game_board[row][column] == (turn % 2) + 1) {
