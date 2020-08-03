@@ -14,6 +14,7 @@ public:
 	int getPlayer();
 	void display_board();
 	void computer_turn(bool static_weight_Heuristic);
+	tuple<int, int, int> checkWin();
 	void human_turn();
 	void change_turn();
 	bool terminate();
@@ -24,8 +25,7 @@ protected:
 	bool game_terminate;
 	char first; 
 	int no_valid_moves;
-	int checkWin();
-	int checkWin(int game_board[8][8], int turn);
+	tuple<int, int, int> checkWin(int game_board[8][8], int turn);
 	void flip(int square);
 	void flip(int square, int game_board[8][8], int turn);
 	void display_moves();

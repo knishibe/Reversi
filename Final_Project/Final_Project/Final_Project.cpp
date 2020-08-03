@@ -3,7 +3,7 @@
 
 #include "Reversi.h"
 #include <iostream>
-using namespace std;
+using namespace std; 
 
 int main()
 {
@@ -71,11 +71,13 @@ int main()
     int v1_Wins = 0;
     int v2_Wins = 0;
     int ties = 0;
+    vector<tuple<int, int>> won_by;
+    tuple<int, int, int> win_results;
     for (int i = 0; i < 25; i++) {
         Reversi* game = new Reversi();
         int computer = 1;
         
-        game->display_moves();
+        game->display_board();
         while (!game->terminate()) {
             if (game->getPlayer() == computer) {
                 game->computer_turn(true);
@@ -88,12 +90,16 @@ int main()
             game->change_turn();
         }
         game->change_turn();
-        int win = game->checkWin();
+        
+        win_results = game->checkWin();
+        int win = get<0>(win_results);
         if (win == 1) {
             v1_Wins++;
+            won_by.push_back(make_tuple(1, get<1>(win_results) - get<2>(win_results)));
         }
         else if (win == 0) {
             v2_Wins++;
+            won_by.push_back(make_tuple(1, get<2>(win_results) - get<1>(win_results)));
         }
         else {
             ties++;

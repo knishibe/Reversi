@@ -24,7 +24,7 @@ int Reversi::getPlayer() {
 	return player; 
 }
 
-int Reversi::checkWin() {
+tuple<int, int, int> Reversi::checkWin() {
 	return checkWin(board, player);
 }
 
@@ -32,7 +32,7 @@ bool Reversi::terminate() {
 	return game_terminate;
 }
 
-int Reversi::checkWin(int game_board[8][8], int turn) {
+tuple<int, int, int> Reversi::checkWin(int game_board[8][8], int turn) {
 	int player = 0;
 	int opponent = 0;
 
@@ -48,14 +48,14 @@ int Reversi::checkWin(int game_board[8][8], int turn) {
 	}
 
 	if (player > opponent) {
-		return 1;
+		return make_tuple(1, player, opponent);
 		game_terminate = true;
 	} 
 	else if (player == opponent) {
-		return 2;
+		return make_tuple(2, player, opponent);
 	}
 	else {
-		return 0;
+		return make_tuple(0, player, opponent);
 	}
 }
 
@@ -168,12 +168,15 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 	map<int, int> results;
 
 	if (no_valid_moves >= 2) {
-		int win = checkWin();
+		tuple<int, int, int> win_results = checkWin();
+		int win = get<0>(win_results);
 		if (win == 1) {
-			cout << "Player " << player << " won!\n";
+			cout << "Player " << player << " won ";
+			cout << get<1>(win_results) << ":" << get<2>(win_results) << " !\n";
 		}
 		else if (win == 0) {
-			cout << "Player " << (player%2)+1 << " won!\n";
+			cout << "Player " << (player%2)+1 << " won ";
+			cout << get<2>(win_results) << ":" << get<1>(win_results) << " !\n";
 		}
 		else {
 			cout << "Tie!\n";
@@ -235,12 +238,15 @@ void Reversi::human_turn() {
 	cout << "User's Turn...\n";
 
 	if (no_valid_moves >= 2) {
-		int win = checkWin();
+		tuple<int, int, int> win_results = checkWin();
+		int win = get<0>(win_results);
 		if (win == 1) {
-			cout << "Player " << player << " won!\n";
+			cout << "Player " << player << " won ";
+			cout << get<1>(win_results) << ":" << get<2>(win_results) << " !\n";
 		}
 		else if (win == 0) {
-			cout << "Player " << (player % 2) + 1 << " won!\n";
+			cout << "Player " << (player % 2) + 1 << " won ";
+			cout << get<2>(win_results) << ":" << get<1>(win_results) << " !\n";
 		}
 		else {
 			cout << "Tie!\n";
@@ -354,7 +360,7 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic, f
 			}
 		}
 
-		win = checkWin(sim_board, turn);
+		win = get<0>(checkWin(sim_board, turn));
 		if (win == 1 && turn == 1) {
 			wins += 1;
 		}
