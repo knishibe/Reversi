@@ -197,7 +197,7 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 	if (static_weight_Heuristic) {
 		time_t future_time = time(NULL) + 5;
 		for (int i = 0; i < moves.size(); i++) {
-			tuple<int, int, int> stat = static_weight_Playouts(moves[i]);
+			tuple<int, int, int> stat = playouts(moves[i], true);
 			results[moves[i]] = get<1>(stat); // can modify equation 
 
 			if (time(NULL) > future_time) {
@@ -208,7 +208,7 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 	else { // pure random playouts
 		time_t future_time = time(NULL) + 5;
 		for (int i = 0; i < moves.size(); i++) {
-			tuple<int, int, int> stat = randomPlayouts(moves[i]);
+			tuple<int, int, int> stat = playouts(moves[i], false);
 			results[moves[i]] = get<1>(stat); // can modify equation
 			if (time(NULL) > future_time) {
 				break;
@@ -291,15 +291,7 @@ void Reversi::change_turn() {
 	player = (player % 2) + 1;
 }
 
-tuple<int, int, int> Reversi::static_weight_Playouts(int move) {
-	const int STATIC_WEIGHT_1[8][8] = { { 4,-3, 2, 2, 2, 2,-3, 4},
-										{-3,-4,-1,-1,-1,-1,-4,-3},
-										{ 2,-1, 1, 0, 0, 1,-1, 2},
-										{ 2,-1, 0, 1, 1, 0,-1, 2},
-										{ 2,-1, 0, 1, 1, 0,-1, 2},
-										{ 2,-1, 1, 0, 0, 1,-1, 2},
-										{-3,-4,-1,-1,-1,-1,-4,-3},
-										{ 4,-3, 2, 2, 2, 2,-3, 4} };
+tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic) {
 	int wins = 0;
 	int ties = 0;
 	int losts = 0;
@@ -337,22 +329,13 @@ tuple<int, int, int> Reversi::static_weight_Playouts(int move) {
 		}
 
 		while (moves.size() > 0 && no_valid_moves < 2) {
-			int best_move_score = STATIC_WEIGHT_1[(moves[0] - 1) / BOARD_SIZE][(moves[0] - 1) % BOARD_SIZE];
-			int best_index = 0;
-
-			for (int j = 1; j < moves.size(); j++) {
-				int r = (moves[j] - 1) / BOARD_SIZE;
-				int c = (moves[j] - 1) % BOARD_SIZE; 
-				if (STATIC_WEIGHT_1[r][c] > best_move_score) {
-					best_move_score = STATIC_WEIGHT_1[r][c];
-					best_index = j;
-				}
-				if (time(NULL) > future_time) {
-					return tie(wins, ties, losts);
-				}
+			int nextMove = 0;
+			if (static_weight_heuristic) {
+				nextMove = best_static_weight_move(moves);
 			}
-
-			int nextMove = moves[best_index];
+			else {
+				nextMove = pure_move(moves);
+			}
 
 			if (turn == 1) {
 				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 1;
@@ -396,93 +379,36 @@ tuple<int, int, int> Reversi::static_weight_Playouts(int move) {
 	}
 }
 
+int Reversi::best_static_weight_move(vector<int> moves) {
+	const int STATIC_WEIGHT_1[8][8] = { { 4,-3, 2, 2, 2, 2,-3, 4},
+										{-3,-4,-1,-1,-1,-1,-4,-3},
+										{ 2,-1, 1, 0, 0, 1,-1, 2},
+										{ 2,-1, 0, 1, 1, 0,-1, 2},
+										{ 2,-1, 0, 1, 1, 0,-1, 2},
+										{ 2,-1, 1, 0, 0, 1,-1, 2},
+										{-3,-4,-1,-1,-1,-1,-4,-3},
+										{ 4,-3, 2, 2, 2, 2,-3, 4} };
 
-tuple<int, int, int> Reversi::randomPlayouts(int move) {
-	int wins = 0;
-	int ties = 0;
-	int losts = 0;
+	int best_move_score = STATIC_WEIGHT_1[(moves[0] - 1) / BOARD_SIZE][(moves[0] - 1) % BOARD_SIZE];
+	int best_index = 0;
 
-	int col = (move - 1) % BOARD_SIZE;
-	int row = (move - 1) / BOARD_SIZE;
-
-	int turn = 0;
-
-	srand(time(nullptr));
-
-	int i = 0;
-	time_t future_time = time(NULL) + 2;
-
-	while (true) {
-		if (time(NULL) > future_time) {
-			return tie(wins, ties, losts);
+	for (int j = 1; j < moves.size(); j++) {
+		int r = (moves[j] - 1) / BOARD_SIZE;
+		int c = (moves[j] - 1) % BOARD_SIZE;
+		if (STATIC_WEIGHT_1[r][c] > best_move_score) {
+			best_move_score = STATIC_WEIGHT_1[r][c];
+			best_index = j;
 		}
-		// Create simulation board
-		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
-		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
-		turn = getPlayer();
-
-		// Computers makes the theoretical move
-		sim_board[row][col] = turn;
-		turn = (turn % 2) + 1; // player's turn
-
-		vector<int> moves = possible_moves(sim_board, turn);
-		bool win = false;
-
-		int no_valid_moves = 0;
-		while (moves.empty() && no_valid_moves < 2){
-			no_valid_moves++;
-			turn = (turn % 2) + 1;
-			moves.clear();
-			moves = possible_moves(sim_board, turn);
-		}
-
-		while (moves.size() > 0 && no_valid_moves < 2) {
-			if (time(NULL) > future_time) {
-				return tie(wins, ties, losts);
-			}
-			int index = rand() % moves.size();
-			int nextMove = moves[index];
-
-			if (turn == 1) {
-				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 1;
-				flip(nextMove, sim_board, 1);
-			}
-			else {
-				sim_board[(nextMove - 1) / BOARD_SIZE][(nextMove - 1) % BOARD_SIZE] = 2;
-				flip(nextMove, sim_board, 2);
-			}
-
-			(turn == 2) ? turn = 1 : turn = 2;
-			moves.clear();
-			moves = possible_moves(sim_board, turn);
-
-			int no_valid_moves = 0;
-			// Player has no valid moves. Change turn. Only exit the outer while loop if 
-			// there are no valid moves two turns in a row.
-			while (moves.empty() && no_valid_moves < 2) {
-				no_valid_moves++;
-				(turn == 2) ? turn = 1 : turn = 2;
-				moves.clear();
-				moves = possible_moves(sim_board, turn);
-			}
-
-			if (no_valid_moves >= 2) {
-				break;
-			}
-		}
-
-		win = checkWin(sim_board, turn);
-		if (win == 1 && turn == 1) {
-			wins += 1;
-		}
-		else if (win == 1 && turn == 2) {
-			losts += 1;
-		}
-		else {
-			ties += 1; // no win or loss
-		}
-		i++;
 	}
+	int nextMove = moves[best_index];
+	return nextMove;
+}
+
+int Reversi::pure_move(vector<int> moves) {
+	srand(time(nullptr));
+	int index = rand() % moves.size();
+	int nextMove = moves[index];
+	return nextMove;
 }
 
 vector<int> Reversi::possible_moves() {

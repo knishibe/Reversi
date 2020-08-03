@@ -24,7 +24,10 @@ public:
 	bool terminate();
 
 	tuple<int, int, int> randomPlayouts(int move);
-	tuple<int, int, int> static_weight_Playouts(int move);
+	tuple<int, int, int> playouts(int move, bool static_weight_heuristic);
+	int best_static_weight_move(vector<int> moves);
+	int pure_move(vector<int> moves);
+
 
 	int capture_corners_heuristic();
 
