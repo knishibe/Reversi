@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-    char version = NULL;
+    /*char version = NULL;
     cout << "1. Play with Version 1 (MCTS - random playouts)\n";
     cout << "2. Play with Version 2 (MCTS - with heuristics)\n";
     cout << "3. Observe a computer played game between Versions 1 and 2\n\n";
@@ -65,13 +65,13 @@ int main()
             }
             game->change_turn();
         }
-    }
+    }*/
 
     // Test Run 50 games to compare Versions
-    /*int v1_Wins = 0;
+    int v1_Wins = 0;
     int v2_Wins = 0;
     int ties = 0;
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 25; i++) {
         Reversi* game = new Reversi();
         int computer = 1;
         
@@ -87,12 +87,12 @@ int main()
             }
             game->change_turn();
         }
-
+        game->change_turn();
         int win = game->checkWin();
         if (win == 1) {
             v1_Wins++;
         }
-        else if (win == 2) {
+        else if (win == 0) {
             v2_Wins++;
         }
         else {
@@ -101,7 +101,7 @@ int main()
     }
     cout << "V1 Wins: " << v1_Wins << endl;
     cout << "V2 Wins: " << v2_Wins << endl;
-    cout << "Ties: " << ties << endl;*/
+    cout << "Ties: " << ties << endl;
 
     return 0;
 }
