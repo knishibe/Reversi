@@ -69,6 +69,9 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 	int current_column = (square-1) % 8;
 	int row = 0;
 	int column = 0;
+	int flip_row = 0;
+	int flip_column = 0;
+	int counter = 0;
 	tuple<int, int> next_square;
 	bool opposite_player = false;
 	bool flip = false;
@@ -78,6 +81,7 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 		row = current_row;
 		column = current_column;
 		flip = false;
+		counter = 0;
 		opposite_player = false;
 		while (true) {
 			next_square = nextSpot(make_tuple(row, column), directions[i]);
@@ -89,6 +93,7 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 			}
 			else if (game_board[row][column] == (turn % 2) + 1) {
 				opposite_player = true;
+				counter++;
 			}
 			else {
 				break;
@@ -96,14 +101,15 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 		}
 		if (flip) {
 			next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
-			current_row = get<0>(next_square);
-			current_column = get<1>(next_square);
-			game_board[current_row][current_column] = turn;
-			while (!(current_row == row && current_column == column)) {
-				next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
-				current_row = get<0>(next_square);
-				current_column = get<1>(next_square);
-				game_board[current_row][current_column] = turn;
+			flip_row = get<0>(next_square);
+			flip_column = get<1>(next_square);
+			game_board[flip_row][flip_column] = turn;
+			counter--;
+			for(counter; counter > 0; counter--) {
+				next_square = nextSpot(make_tuple(flip_row, flip_column), directions[i]);
+				flip_row = get<0>(next_square);
+				flip_column = get<1>(next_square);
+				game_board[flip_row][flip_column] = turn;
 			}
 		}
 	}
@@ -478,20 +484,20 @@ tuple<int, int> Reversi::nextSpot(tuple<int, int> currentSpot, string direction)
 			return make_tuple(i, j + 1);
 		}
 	} else if (direction == "upper_right") {
-		if (i + 1 < BOARD_SIZE && j + 1 < BOARD_SIZE) {
-			return make_tuple(i + 1, j + 1);
-		}
-	} else if (direction == "upper_left") {
-		if (i + 1 < BOARD_SIZE && j - 1 >= 0) {
-			return make_tuple(i + 1, j - 1);
-		}
-	} else if (direction == "lower_right") {
 		if (i - 1 >= 0 && j + 1 < BOARD_SIZE) {
 			return make_tuple(i - 1, j + 1);
 		}
-	} else if (direction == "lower_left") {
+	} else if (direction == "upper_left") {
 		if (i - 1 >= 0 && j - 1 >= 0) {
 			return make_tuple(i - 1, j - 1);
+		}
+	} else if (direction == "lower_right") {
+		if (i + 1 < BOARD_SIZE && j + 1 < BOARD_SIZE) {
+			return make_tuple(i + 1, j + 1);
+		}
+	} else if (direction == "lower_left") {
+		if (i + 1 < BOARD_SIZE && j - 1 >= 0) {
+			return make_tuple(i + 1, j - 1);
 		}
 	}
 	return make_tuple(-1, -1);
