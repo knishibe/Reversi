@@ -96,11 +96,11 @@ int main()
         int player = game->getPlayer();
         if ((player == 1 && win == 1) || (player == 2 && win == 0)) {
             v1_Wins++;
-            won_by.push_back(make_tuple(1, get<1>(win_results) - get<2>(win_results)));
+            won_by.push_back(make_tuple(1, abs(get<1>(win_results) - get<2>(win_results))));
         }
         else if ((player == 2 && win == 1) || (player == 1 && win == 0)) {
             v2_Wins++;
-            won_by.push_back(make_tuple(2, get<2>(win_results) - get<1>(win_results)));
+            won_by.push_back(make_tuple(2, abs(get<2>(win_results) - get<1>(win_results))));
         }
         else {
             ties++;
