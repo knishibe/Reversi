@@ -93,11 +93,12 @@ int main()
         
         win_results = game->checkWin();
         int win = get<0>(win_results);
-        if (win == 1) {
+        int player = game->getPlayer();
+        if ((player == 1 && win == 1) || (player == 2 && win == 0)) {
             v1_Wins++;
             won_by.push_back(make_tuple(1, get<1>(win_results) - get<2>(win_results)));
         }
-        else if (win == 0) {
+        else if ((player == 2 && win == 1) || (player == 1 && win == 0)) {
             v2_Wins++;
             won_by.push_back(make_tuple(2, get<2>(win_results) - get<1>(win_results)));
         }
@@ -108,6 +109,7 @@ int main()
     cout << "V1 Wins: " << v1_Wins << endl;
     cout << "V2 Wins: " << v2_Wins << endl;
     cout << "Ties: " << ties << endl;
+    cout << "\n\n";
     for (int i = 0; i < won_by.size(); i++) {
         cout << "Game: " << i << "\n";
         cout << "Winner: " << get<0>(won_by[i]) << "\n";
