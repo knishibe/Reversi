@@ -191,7 +191,6 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 		return;
 	}
 
-	cout << "Computer's Turn...\n";
 	vector<int> moves = possible_moves();
 	if (moves.empty()) {// no valid moves. Change turn
 		cout << "No valid moves available\n";
