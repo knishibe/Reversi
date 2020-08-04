@@ -39,6 +39,7 @@ int main()
 
         while (!game->terminate()) {
             if (game->getPlayer() == computer) {
+                cout << "Computer's Turn...\n"
                 version == 1 ? game->computer_turn(false) : game->computer_turn(true);
                 game->display_board();
             }
@@ -79,12 +80,13 @@ int main()
         
         game->display_board();
         while (!game->terminate()) {
-            if (game->getPlayer() == computer) {
-                game->computer_turn(true);
+            cout << "Computer V" << game->getPlayer()%2+1 << "'s Turn...\n"; 
+            if (game->getPlayer() == computer) { 
+                game->computer_turn(true); // Heuristic = Player 1
                 game->display_board();
             }
             else {
-                game->computer_turn(false);
+                game->computer_turn(false); // Pure Random Playouts = Player 2
                 game->display_board();
             }
             game->change_turn();

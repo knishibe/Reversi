@@ -191,7 +191,6 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 		return;
 	}
 
-	cout << "Computer's Turn...\n";
 	vector<int> moves = possible_moves();
 	if (moves.empty()) {// no valid moves. Change turn
 		cout << "No valid moves available\n";
@@ -206,27 +205,27 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 		
 	if (static_weight_Heuristic) {
 		for (int i = 0; i < moves.size(); i++) {
-			tuple<int, int, int> stat = playouts(moves[i], true, time_per_move);
-			results[moves[i]] = get<1>(stat); // can modify equation 
+			tuple<int, int, int> stat = playouts(moves[i], true, time_per_move); // wins, ties, losts
+			results[moves[i]] = get<0>(stat)-get<2>(stat); // Wins: +1, Ties: 0, Losts: -1
 		}
 	}
 	else { // pure random playouts
 		for (int i = 0; i < moves.size(); i++) {
 			tuple<int, int, int> stat = playouts(moves[i], false, time_per_move);
-			results[moves[i]] = get<1>(stat); // can modify equation
+			results[moves[i]] = get<0>(stat) - get<2>(stat); 
 		}
 	}
 		
-	// get move resulting in the smallest amount of ties
+	// get move resulting in the maximum score
 	int next_move = results.begin()->first;
-	int min_Ties = results.begin()->second;
+	int max_score = results.begin()->second;
 	int test_move = 0;
 	map<int, int>::iterator it;
 	for (it = results.begin(); it != results.end(); it++)
 	{
 		test_move = it->second; // get dict value
-		if (test_move < min_Ties) {
-			min_Ties = test_move;
+		if (test_move > max_score) {
+			max_score = test_move;
 			next_move = it->first;
 		}
 	}
