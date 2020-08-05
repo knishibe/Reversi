@@ -496,18 +496,31 @@ int Reversi::best_static_weight_move(vector<int> moves) {
 										{ 4,-3, 2, 2, 2, 2,-3, 4} };
 
 	int best_move_score = STATIC_WEIGHT_1[(moves[0] - 1) / BOARD_SIZE][(moves[0] - 1) % BOARD_SIZE];
-	int best_index = 0;
+	vector<int> best_indexes;
+	int nextMove = 0;
 
 	// Choose the next possible move based on the highest static weight score
 	for (int j = 1; j < moves.size(); j++) {
 		int r = (moves[j] - 1) / BOARD_SIZE;
 		int c = (moves[j] - 1) % BOARD_SIZE;
 		if (STATIC_WEIGHT_1[r][c] > best_move_score) {
+			best_indexes.clear();
 			best_move_score = STATIC_WEIGHT_1[r][c];
-			best_index = j;
+			best_indexes.push_back(j);
+		}
+		else if (STATIC_WEIGHT_1[r][c] == best_move_score) {
+			best_indexes.push_back(j);
 		}
 	}
-	int nextMove = moves[best_index];
+
+	if (best_indexes.size() > 1) {
+		srand(time(nullptr));
+		int index = rand() % best_indexes.size();
+		nextMove = moves[index];
+	}
+	else {
+		nextMove = moves[best_indexes[0]];
+	}
 	return nextMove;
 }
 
