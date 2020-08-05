@@ -7,10 +7,13 @@
 using namespace std;
 
 Reversi::Reversi() {
+
+	// initialize board
 	board[3][3] = 2;
 	board[3][4] = 1;
 	board[4][3] = 1;
 	board[4][4] = 2;
+
 	player = 1;
 	game_terminate = false;
 
@@ -36,6 +39,7 @@ tuple<int, int, int> Reversi::checkWin(int game_board[8][8], int turn) {
 	int player = 0;
 	int opponent = 0;
 
+	// count number of tiles per player
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
 			if (game_board[i][j] == turn) {
@@ -47,6 +51,7 @@ tuple<int, int, int> Reversi::checkWin(int game_board[8][8], int turn) {
 		}
 	}
 
+	// return who won and the scores of each player
 	if (player > opponent) {
 		return make_tuple(1, player, opponent);
 		game_terminate = true;
@@ -77,6 +82,7 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 	bool flip = false;
 	string directions[] = { "up", "down", "left", "right", "upper_right", "upper_left", "lower_right", "lower_left" };
 
+	// flip when appropriate for each direction
 	for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); i++) {
 		row = current_row;
 		column = current_column;
@@ -87,6 +93,8 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 			next_square = nextSpot(make_tuple(row, column), directions[i]);
 			row = get<0>(next_square);
 			column = get<1>(next_square);
+
+			// figure out which directions need to be flipped and how many tokens need to  be flipped
 			if (game_board[row][column] == turn && opposite_player == true) {
 				flip = true;
 				break;
@@ -100,6 +108,7 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 			}
 		}
 		if (flip) {
+			// start at the original token and flip the right ammount of tokens in the current direction
 			next_square = nextSpot(make_tuple(current_row, current_column), directions[i]);
 			flip_row = get<0>(next_square);
 			flip_column = get<1>(next_square);
@@ -116,6 +125,7 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 }
 
 void Reversi::display_board() {
+	// print board
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
 			cout << " ";
@@ -139,6 +149,7 @@ void Reversi::display_board() {
 }
 
 void Reversi::display_moves() {
+	// print board with available moves 
 	vector<int> moves = possible_moves();
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
@@ -427,9 +438,13 @@ vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 	int row = 0;
 	int column = 0;
 	int move = 0;
+
+	// check for moves for each token the current player has
 	for(auto& i : pieces)  {
 		current_row = get<0>(i);
 		current_column = get<1>(i);
+
+		// check for moves in all directions
 		for (int j = 0; j < sizeof(directions)/sizeof(directions[0]); j++) {
 			row = current_row;
 			column = current_column;
@@ -439,9 +454,11 @@ vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 				row = get<0>(square);
 				column = get<1>(square);
 				if (row == -1 || column == -1) {
-					break; // no more moves
+					// no more moves
+					break; 
 				}
 				else if (game_board[row][column] == 0 && opposite_player == true) {
+					// add move to list of possible moves if its not already there
 					move = row * 8 + column + 1;
 					if (find(moves.begin(), moves.end(), move) == moves.end()) {
 						moves.push_back(move);
@@ -466,6 +483,7 @@ tuple<int, int> Reversi::nextSpot(tuple<int, int> currentSpot, string direction)
 	int i = get<0>(currentSpot);
 	int j = get<1>(currentSpot);
 
+	// find the next square in the appropriate direction
 	if (direction == "up") {
 		if (i - 1 >= 0) {
 			return make_tuple(i - 1, j);
@@ -503,6 +521,7 @@ tuple<int, int> Reversi::nextSpot(tuple<int, int> currentSpot, string direction)
 }
 
 vector<tuple<int, int>> Reversi::find_pieces(int game_board[8][8]) {
+	// find the squares with tokens of the current player
 	vector<tuple<int, int>> pieces;
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
