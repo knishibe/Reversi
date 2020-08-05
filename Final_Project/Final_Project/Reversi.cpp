@@ -402,8 +402,10 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic, f
 
 	int i = 0;
 	time_t start_time = time(NULL);
+	int count = 0;
 
 	while (difftime(time(NULL), start_time) < time_per_move) {
+		count++;
 		// Create simulation board
 		int sim_board[BOARD_SIZE][BOARD_SIZE] = { 0 };
 		copy(&board[0][0], &board[0][0] + BOARD_SIZE * BOARD_SIZE, &sim_board[0][0]);
@@ -473,6 +475,7 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic, f
 		}
 		i++;
 	}
+	cout << time_per_move << " " << count << "\n";
 	return tie(wins, ties, losts);
 }
 
