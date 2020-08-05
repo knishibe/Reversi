@@ -37,7 +37,7 @@ int main()
         }
 
         cout << "\n";
-
+        game->display_board();
         while (!game->terminate()) {
             if (game->getPlayer() == computer) {
                 cout << "Computer's Turn...\n";
@@ -52,7 +52,7 @@ int main()
         }
     }
     // Computer Version 1 vs Computer Version 2
-    else { 
+    else{ 
         Reversi* game = new Reversi();
         int computer = 1;
 
