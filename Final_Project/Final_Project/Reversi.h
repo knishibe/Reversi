@@ -33,8 +33,7 @@ protected:
 	vector<int> possible_moves(int game_board[8][8], int turn);
 	tuple<int, int> nextSpot(tuple<int, int> currentSpot, string direction);
 	vector<tuple<int, int>> find_pieces(int game_board[8][8]);
-	int best_static_weight_move(vector<int> moves);
-	int pure_move(vector<int> moves);
+	int best_static_weight_move(vector<int> moves); // Heuristic function
+	int pure_move(vector<int> moves); // Choose random move
 	tuple<int, int, int> playouts(int move, bool static_weight_heuristic, float time_per_move);
 };
-

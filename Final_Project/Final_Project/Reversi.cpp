@@ -1,11 +1,22 @@
-﻿#include "Reversi.h"
+﻿// =================================================================================
+//									Reversi Class
+// =================================================================================
+
+#include "Reversi.h"
 #include <algorithm>
 #include <iostream>
 #include <ctime>
 #include <map>
 #include <iomanip>
+
 using namespace std;
 
+/**
+ * Reversi Constructor
+ *
+ * @param none
+ * @return none
+ */
 Reversi::Reversi() {
 
 	// initialize board
@@ -23,18 +34,42 @@ Reversi::Reversi() {
 	return;
 }
 
+/**
+ * Current Player
+ *
+ * @param none
+ * @return int player
+ */
 int Reversi::getPlayer() { 
 	return player; 
 }
 
-tuple<int, int, int> Reversi::checkWin() {
-	return checkWin(board, player);
-}
-
+/**
+ * Checks whether game is complete
+ *
+ * @param none
+ * @return bool game_terminate
+ */
 bool Reversi::terminate() {
 	return game_terminate;
 }
 
+/**
+ * Check win
+ *
+ * @param none
+ * @return tuple<int, int, int> containing result, player, opponent
+ */
+tuple<int, int, int> Reversi::checkWin() {
+	return checkWin(board, player);
+}
+
+/**
+ * Check win
+ *
+ * @param int game_board[8][8], int turn
+ * @return tuple<int, int, int> containing result, player, opponent
+ */
 tuple<int, int, int> Reversi::checkWin(int game_board[8][8], int turn) {
 	int player = 0;
 	int opponent = 0;
@@ -64,11 +99,23 @@ tuple<int, int, int> Reversi::checkWin(int game_board[8][8], int turn) {
 	}
 }
 
+/**
+ * Flip pieces associated with a move
+ *
+ * @param int square
+ * @return none
+ */
 void Reversi::flip(int square) {
 	flip(square, board, player);
 	return;
 }
 
+/**
+ * Flip pieces associated with a move
+ *
+ * @param int square, int game_board[8][8], int turn
+ * @return none
+ */
 void Reversi::flip(int square, int game_board[8][8], int turn) {
 	int current_row = (square-1)/8;
 	int current_column = (square-1) % 8;
@@ -124,6 +171,12 @@ void Reversi::flip(int square, int game_board[8][8], int turn) {
 	}
 }
 
+/**
+ * Display Board
+ *
+ * @param none
+ * @return none
+ */
 void Reversi::display_board() {
 	// print board
 	for (int i = 0; i < BOARD_SIZE; i++) {
@@ -148,6 +201,12 @@ void Reversi::display_board() {
 	cout << "\n\n\n";
 }
 
+/**
+ * Display Moves
+ *
+ * @param none
+ * @return none
+ */
 void Reversi::display_moves() {
 	// print board with available moves 
 	vector<int> moves = possible_moves();
@@ -181,9 +240,16 @@ void Reversi::display_moves() {
 	cout << "\n\n";
 }
 
+/**
+ * Computer Move.
+ *
+ * @param Boolean parameter to indicate whether a heuristic should be used
+ * @return none
+ */
 void Reversi::computer_turn(bool static_weight_Heuristic) {
 	map<int, int> results;
 
+	// If both players do no have valid moves, check win
 	if (no_valid_moves >= 2) {
 		tuple<int, int, int> win_results = checkWin();
 		int win = get<0>(win_results);
@@ -241,11 +307,18 @@ void Reversi::computer_turn(bool static_weight_Heuristic) {
 		}
 	}
 
+	// Make move
 	board[(next_move - 1) / BOARD_SIZE][(next_move - 1) % BOARD_SIZE] = player;
+	// Flip tokens associated with the move
 	flip(next_move);
 }
 
-
+/**
+ * Human Move.
+ *
+ * @param none
+ * @return none
+ */
 void Reversi::human_turn() {
 	int square = 0;
 	int row = 0;
@@ -301,10 +374,22 @@ void Reversi::human_turn() {
 	flip(square);
 }
 
+/**
+ * Change turn
+ *
+ * @param none
+ * @return none
+ */
 void Reversi::change_turn() {
 	player = (player % 2) + 1;
 }
 
+/**
+ * Do a series of  playouts based on next move
+ *
+ * @param int move, bool static_weight_heuristic, float time_per_move
+ * @return - tuple containing number of wins, ties, losts
+ */
 tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic, float time_per_move) {
 	int wins = 0;
 	int ties = 0;
@@ -391,6 +476,12 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic, f
 	return tie(wins, ties, losts);
 }
 
+/**
+ * Choose the next move based on the best static weight score
+ *
+ * @param vector<int> moves
+ * @return int nextMove
+ */
 int Reversi::best_static_weight_move(vector<int> moves) {
 	const int STATIC_WEIGHT_1[8][8] = { { 4,-3, 2, 2, 2, 2,-3, 4},
 										{-3,-4,-1,-1,-1,-1,-4,-3},
@@ -404,6 +495,7 @@ int Reversi::best_static_weight_move(vector<int> moves) {
 	int best_move_score = STATIC_WEIGHT_1[(moves[0] - 1) / BOARD_SIZE][(moves[0] - 1) % BOARD_SIZE];
 	int best_index = 0;
 
+	// Choose the next possible move based on the highest static weight score
 	for (int j = 1; j < moves.size(); j++) {
 		int r = (moves[j] - 1) / BOARD_SIZE;
 		int c = (moves[j] - 1) % BOARD_SIZE;
@@ -416,6 +508,12 @@ int Reversi::best_static_weight_move(vector<int> moves) {
 	return nextMove;
 }
 
+/**
+ * Choose the next move based on a random move
+ *
+ * @param vector<int> moves
+ * @return int nextMove
+ */
 int Reversi::pure_move(vector<int> moves) {
 	srand(time(nullptr));
 	int index = rand() % moves.size();
@@ -423,10 +521,22 @@ int Reversi::pure_move(vector<int> moves) {
 	return nextMove;
 }
 
+/**
+ * List of possible moves
+ *
+ * @param none
+ * @return vector<int> moves
+ */
 vector<int> Reversi::possible_moves() {
 	return possible_moves(board, player);
 }
 
+/**
+ * List of possible moves
+ *
+ * @param int game_board[8][8], int turn
+ * @return vector<int> moves
+ */
 vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 	vector<int> moves;
 	vector<tuple<int, int>> pieces = find_pieces(game_board);
@@ -479,6 +589,12 @@ vector<int> Reversi::possible_moves(int game_board[8][8], int turn) {
 	return moves;
 }
 
+/**
+ * Choose next spot
+ *
+ * @param tuple<int, int> currentSpot, string direction
+ * @return tuple<int, int> spot
+ */
 tuple<int, int> Reversi::nextSpot(tuple<int, int> currentSpot, string direction) {
 	int i = get<0>(currentSpot);
 	int j = get<1>(currentSpot);
@@ -520,6 +636,12 @@ tuple<int, int> Reversi::nextSpot(tuple<int, int> currentSpot, string direction)
 	return make_tuple(-1, -1);
 }
 
+/**
+ * Finds pieces associated to a player
+ *
+ * @param int game_board[8][8]
+ * @return vector<tuple<int, int>> pieces
+ */
 vector<tuple<int, int>> Reversi::find_pieces(int game_board[8][8]) {
 	// find the squares with tokens of the current player
 	vector<tuple<int, int>> pieces;
