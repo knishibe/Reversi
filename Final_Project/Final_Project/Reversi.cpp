@@ -475,7 +475,7 @@ tuple<int, int, int> Reversi::playouts(int move, bool static_weight_heuristic, f
 		}
 		i++;
 	}
-	cout << time_per_move << " " << count << "\n";
+	//cout << time_per_move << " " << count << "\n";
 	return tie(wins, ties, losts);
 }
 
@@ -498,6 +498,7 @@ int Reversi::best_static_weight_move(vector<int> moves) {
 	int best_move_score = STATIC_WEIGHT_1[(moves[0] - 1) / BOARD_SIZE][(moves[0] - 1) % BOARD_SIZE];
 	vector<int> best_indexes;
 	int nextMove = 0;
+	best_indexes.push_back(0);
 
 	// Choose the next possible move based on the highest static weight score
 	for (int j = 1; j < moves.size(); j++) {
